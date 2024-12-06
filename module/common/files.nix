@@ -1,9 +1,17 @@
-{ config, lib, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   inherit (lib) mkOption filterAttrs concatMapStringsSep attrValues mkIf;
   inherit (lib.types) attrsOf bool nullOr path str submodule;
   inherit (pkgs) writeText;
-  fileOptions = { config, name, ... }: {
+  fileOptions = {
+    config,
+    name,
+    ...
+  }: {
     options = {
       name = mkOption {
         type = str;
@@ -53,16 +61,18 @@ let
   };
   enabledFiles = filterAttrs (name: cfg: cfg.enable) config.files;
   link = f:
-    if f.recursive then ''
+    if f.recursive
+    then ''
       mkdir -p "${f.target}"
       lndir -silent "${f.source}" "${f.target}"
-    '' else ''
+    ''
+    else ''
       if [[ -e "${f.target}" ]]; then
         echo "Not linking ${f.name} because a file with same name already exists at ${f.target}."
         false # trigger error
       else
         mkdir -p $(dirname "${f.target}")
-        ln -s "${f.source}" "${f.target}"
+        ln -sf "${f.source}" "${f.target}"
       fi
     '';
   checkAndLink = f: ''
@@ -76,7 +86,7 @@ in {
     files = mkOption {
       type = attrsOf (submodule fileOptions);
       description = "Set files to link into the working directory.";
-      default = { };
+      default = {};
     };
   };
   config = {
@@ -84,8 +94,8 @@ in {
       text = ''
         ${concatMapStringsSep "\n" checkAndLink (attrValues enabledFiles)}
       '';
-      deps = [ "enterWorkingDirectory" ];
+      deps = ["enterWorkingDirectory"];
     };
-    launchScript.path = with pkgs; [ xorg.lndir ];
+    launchScript.path = with pkgs; [xorg.lndir];
   };
 }
