@@ -43,10 +43,10 @@ with lib; let
           hashTwo = builtins.substring 0 2 a.hash + "/" + a.hash;
         in ''
           mkdir -p $out/objects/${builtins.substring 0 2 a.hash}
-          ln -sf ${asset} $out/objects/${hashTwo}
+          ln -sfv ${asset} $out/objects/${hashTwo}
         '')))}
       mkdir -p $out/indexes
-      ln -sf ${builtins.toFile "assets.json" (builtins.toJSON assetsIndex)} \
+      ln -sfv ${builtins.toFile "assets.json" (builtins.toJSON assetsIndex)} \
           $out/indexes/${versionInfo.assets}.json
     '';
   buildFabricLibraries = libraries: map (lib: fetchJar lib) libraries;

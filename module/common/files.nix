@@ -72,7 +72,7 @@
         false # trigger error
       else
         mkdir -p $(dirname "${f.target}")
-        ln -sf "${f.source}" "${f.target}"
+        ln -sfv "${f.source}" "${f.target}"
       fi
     '';
   checkAndLink = f: ''
